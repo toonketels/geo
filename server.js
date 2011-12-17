@@ -29,7 +29,6 @@ function start( route, handle ) {
     // is received.
     request.addListener( "data", function( postDataChunk ) {
       postData += postDataChunk;
-      console.log( "Received POST data chuck'" + postDataChunk +"'." );
     });
     
     // Request also listens to the "end" event.

@@ -2,6 +2,7 @@
 // to our request handler.
 
 var geocoder = require( './geocoder' );
+var querystring = require( 'querystring' );
 
 function start( response, postData ) {
   console.log( "Request handler 'start' was called." );
@@ -12,9 +13,9 @@ function start( response, postData ) {
   body += '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'
   body += '</head>';
   body += '<body>';
-  body += '<form action="/upload" method="post">';
+  body += '<form action="/coordinates" method="post">';
   body += '<textarea name="text" rows"20" cols="60"></textarea>';
-  body += '<input type="submit" value="Submit text" />';
+  body += '<input type="submit" value="Get coordinates" />';
   body += '</form>'
   body += '</body>';
   body += '</html>';
@@ -38,11 +39,12 @@ function upload( response, postData ) {
 }
 
 
-function birthplace( response, postData ) {
-  console.log( "Request handler 'birthplace' was called" );
+function coordinates( response, postData ) {
+  // Get the address
+  var address = querystring.parse( postData ).text;
+  console.log( "Request handler 'birthplace' was called with following address: " + address );
 
-  var address = 'Winterslagstraat 201, 3600 Genk, Belgie';
-
+  // Get the coordinates
   geocoder.getCoordinates( address, function( error, address, coordinates ){
     // Check if we have some errors
     if( error ) {
@@ -66,4 +68,4 @@ function birthplace( response, postData ) {
 
 exports.start = start;
 exports.upload = upload;
-exports.birthplace = birthplace;
+exports.coordinates = coordinates;
