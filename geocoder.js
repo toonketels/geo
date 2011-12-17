@@ -6,8 +6,7 @@ var util = require( 'util' );
 function getCoordinates( address, callback) {
     
     console.log( 'Geocoder has been requested for some coordinates.' );
-    
-    
+
     // ex: http://maps.googleapis.com/maps/api/geocode/json?address=Winterslagstraat+201+3600+Genk+Beglium&sensor=false
     $path = '/maps/api/geocode/json';
     $params = 'address=Winterslagstraat+201+3600+Genk+Beglium&sensor=false'
@@ -24,43 +23,65 @@ function getCoordinates( address, callback) {
         var data = '';
         var responseObject;
         var coordinates;
-        var lat;
-        var lng;
         
         response.setEncoding( 'utf8' );
+        console.log( 'Geocoder requested coordinates' );
         
-        //console.log( util.inspect( response ) );
-        console.log( 'Requested coordinates' );
+        if( response.statusCode != 200 ) {
+            var errorText = 'Geocoder: we had a problem with Google\'s server. Received status code: ' + response.statusCode;
+            console.log( errorText );
+            callback( new Error( errorText ) );
+            return;
+        }
+        
+        response.on( 'error', function( error){
+            var errorText = 'Geocoder received an error when getting the response.';
+            console.log( errorText );
+            callback( new Error( errorText ) );
+            return;
+        });
         
         response.on( 'data', function( chunk ){
-            //data.setEncoding( 'utf8' );
-            //console.log( 'CHUNCK RECEIVED: ' + chunk );
-            
+            console.log( 'DATA RECEIVED: ' + data );
             data += chunk;
         });
         
         response.on( 'end', function(){
             
+            console.log( 'END EVENT EMITTED: ' + util.inspect( data ) );
             responseObject = JSON.parse( data );
+            
+            console.log( util.inspect( responseObject ) );
+            
             coordinates = responseObject.results[0].geometry.location;
-            lng = coordinates.lng;
-            lat = coordinates.lat;
+            
+            
             
             //console.log ( 'DATA VAR: ' + util.inspect( data ) );
             //console.log( 'RESPONSE OBJECT: ' + util.inspect( responseObject ) );
             //console.log( 'ADDRESS COMPONENTS: ' + util.inspect( responseObject.results ) );
             //console.log( 'ADDRESS COMPONENTS STEP IN: ' + util.inspect( responseObject.results[0].geometry.location ) );
-            console.log ( 'THE COORDINATES ARE ' + lat + ', ' + lng );
-            
-            // Execute callback function
-            callback( lng, lat );
+            //console.log ( 'THE COORDINATES ARE ' + coordinates.lat + ', ' + coordinates.lng );
+
+            callback( null, coordinates );
         });
+    }).on( 'error', function( error ){
+        var errorText = 'We have an error in our get request';
+        console.log( errorText );
+        callback( new Error( errorText ) );
+        return;
     });
-    
-    
-    
     
 }
 
 exports.getCoordinates = getCoordinates;
 
+
+// Error handling
+// var divide = function(x,y,callback) {
+//    if ( y === 0 ) {
+//        return callback(new Error("Can't divide by zero"));
+//    }
+//    return callback(null,x/y)
+// }
+// http://stackoverflow.com/questions/7310521/node-js-best-practice-exception-handling

@@ -41,12 +41,17 @@ function upload( response, postData ) {
 function birthplace( response, postData ) {
   console.log( "Request handler 'birthplace' was called" );
 
-  geocoder.getCoordinates( 'Dummy', function( lng, lat ){
-    
+  geocoder.getCoordinates( 'Dummy', function( error, coordinates ){
+    if( error ) {
+      console.log( error.message );
+      response.writeHead(500, {'Content-Type': 'text/plain'});
+      response.end( 'Sorry, we couldn’t retrieve the coordinates, try again later.' );
+      return;
+    }
     response.writeHead(200, {'Content-Type': 'text/plain'});
-    response.end( 'The coordinates are ' + lng + ' ' + lat );
-  
+    response.end( 'The coordinates are ' + coordinates.lng + ' ' + coordinates.lat );
   });
+  
 }
 
 exports.start = start;
