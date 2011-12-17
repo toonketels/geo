@@ -7,6 +7,7 @@
 
 var http = require( 'http' );
 var util = require( 'util' );
+var querystring = require( 'querystring' );
 
 function getCoordinates( addressGiven, callback) {
     
@@ -19,13 +20,15 @@ function getCoordinates( addressGiven, callback) {
     
     // ex: http://maps.googleapis.com/maps/api/geocode/json?address=Winterslagstraat+201+3600+Genk+Beglium&sensor=false
     var path = '/maps/api/geocode/json';
-    var params = 'address='
-    var tail = '&sensor=false';
+    var params = {
+        address: tempAddress,
+        sensor: 'false'
+    }
     
     $options = {
         host: 'maps.googleapis.com',
         part: 80,
-        path: path + '?' + params + tempAddress + tail,
+        path: path + '?' + querystring.stringify( params ),
         method: 'GET'
     }
     
@@ -57,7 +60,6 @@ function getCoordinates( addressGiven, callback) {
         
         // Collect all data chunks in data var
         response.on( 'data', function( chunk ){
-            console.log( 'DATA RECEIVED: ' + data );
             data += chunk;
         });
         
@@ -91,13 +93,3 @@ function getCoordinates( addressGiven, callback) {
 }
 
 exports.getCoordinates = getCoordinates;
-
-
-// Error handling
-// var divide = function(x,y,callback) {
-//    if ( y === 0 ) {
-//        return callback(new Error("Can't divide by zero"));
-//    }
-//    return callback(null,x/y)
-// }
-// http://stackoverflow.com/questions/7310521/node-js-best-practice-exception-handling
