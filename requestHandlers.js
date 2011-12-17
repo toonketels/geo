@@ -41,13 +41,23 @@ function upload( response, postData ) {
 function birthplace( response, postData ) {
   console.log( "Request handler 'birthplace' was called" );
 
-  geocoder.getCoordinates( 'Dummy', function( error, coordinates ){
+  var address = 'Winterslagstraat 201, 3600 Genk, Belgie';
+
+  geocoder.getCoordinates( address, function( error, address, coordinates ){
+    // Check if we have some errors
     if( error ) {
       console.log( error.message );
       response.writeHead(500, {'Content-Type': 'text/plain'});
       response.end( 'Sorry, we couldn’t retrieve the coordinates, try again later.' );
       return;
     }
+    // Act when we don't have a result
+    if ( !coordinates ) {
+      response.writeHead( 200, {'Content-Type': 'text/plain'} );
+      response.end( 'Sorry, we did not find the coordinates for this address.' );
+      return;
+    }
+    // Finally, act when we do have the result
     response.writeHead(200, {'Content-Type': 'text/plain'});
     response.end( 'The coordinates are ' + coordinates.lng + ' ' + coordinates.lat );
   });
