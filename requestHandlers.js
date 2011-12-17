@@ -1,6 +1,8 @@
 // Accept the postData as an argument to make it available
 // to our request handler.
 
+var geocoder = require( './geocoder' );
+
 function start( response, postData ) {
   console.log( "Request handler 'start' was called." );
   
@@ -35,5 +37,18 @@ function upload( response, postData ) {
   response.end();  
 }
 
+
+function birthplace( response, postData ) {
+  console.log( "Request handler 'birthplace' was called" );
+
+  geocoder.getCoordinates( 'Dummy', function( lng, lat ){
+    
+    response.writeHead(200, {'Content-Type': 'text/plain'});
+    response.end( 'The coordinates are ' + lng + ' ' + lat );
+  
+  });
+}
+
 exports.start = start;
 exports.upload = upload;
+exports.birthplace = birthplace;
